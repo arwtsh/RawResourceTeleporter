@@ -1,0 +1,33 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "1.0.0",
+	"FriendlyName": "RawResourceTeleporter",
+	"Description": "Teleports raw resources directly to your factory.",
+	"Category": "Modding",
+	"CreatedBy": "arwtsh",
+	"CreatedByURL": "https://portfolio.jjasundry.com/",
+	"DocsURL": "",
+	"MarketplaceURL": "",
+	"SupportURL": "",
+	"CanContainContent": true,
+	"IsBetaVersion": false,
+	"IsExperimentalVersion": false,
+	"Installed": false,
+	"Modules": [
+		{
+			"Name": "RawResourceTeleporter",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		}
+	],
+	"Plugins": [
+		{
+			"Name": "SML",
+			"Enabled": true,
+			"SemVersion": "^3.11.1"
+		}
+	],
+	"SemVersion": "1.0.0",
+	"GameVersion": ">=416835"
+}
