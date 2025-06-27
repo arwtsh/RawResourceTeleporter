@@ -11,16 +11,3 @@ ABuild_RecieverBase::ABuild_RecieverBase()
 	PrimaryActorTick.bCanEverTick = true;
 }
 
-// Called when the game starts or when spawned
-void ABuild_RecieverBase::BeginPlay()
-{
-	Super::BeginPlay();
-	
-}
-
-// Called every frame
-void ABuild_RecieverBase::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-}
-

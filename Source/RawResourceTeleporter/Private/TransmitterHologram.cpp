@@ -1,6 +1,8 @@
 // 
 
 #include "TransmitterHologram.h"
+#include "FGFactoryConnectionComponent.h"
+#include "MustSnapToMinerDisqualifier.h"
 
 ATransmitterHologram::ATransmitterHologram()
 {
@@ -8,32 +10,112 @@ ATransmitterHologram::ATransmitterHologram()
 	PrimaryActorTick.bCanEverTick = true;
 }
 
+void ATransmitterHologram::BeginPlay()
+{
+	Super::BeginPlay();
+
+	// The hologram should only have 1 input connection. It will crash if there are none.
+	cachedTransmitterConnection = GetCachedFactoryConnectionComponents()[0];
+
+	// Can be placed hovering over a surface as long as its attached to the extractor.
+	SetNeedsValidFloor(false);
+}
+
 bool ATransmitterHologram::TrySnapToActor(const FHitResult& hitResult)
 {
-	return Super::TrySnapToActor(hitResult);
-	/*
-	AActor* Actor = hitResult.GetActor();
+	const AActor* Actor = hitResult.GetActor();
 
-	if (!IsValid(Actor))
+	if (!(IsValid(Actor) && Actor->IsA<AFGBuildableResourceExtractor>()))
 	{
-		// We moved away from our previous snapping, so clear our tracker
-		Extractor = nullptr;
 		return false;
 	}
 
-	if (Actor->IsA<AFGBuildableResourceExtractor>())
-	{
-		Extractor = Cast<AFGBuildableResourceExtractor>(Actor);
-		// Here you can add your custom snapping logic.
-		// We are using `SetActorLocationAndRotation` which is better for performance than setting single properties.
+	const AFGBuildableResourceExtractor* extractor = Cast<AFGBuildableResourceExtractor>(Actor);
 
-		
-		
-		SetActorLocationAndRotation(Actor->GetActorLocation(), Actor->GetActorRotation());
-		// We snapped, so return true to disable following updates
-		return true;
+	if (!IsValid(extractor))
+	{
+		return false;
 	}
 
-	Extractor = nullptr;
-	return false;*/
+	// Since all extractors, miners, water pumps, oil, etc. all use the same base class, a FName seperates the type.
+	if (!extractor->GetExtractorTypeName().IsEqual(extractorTypeName))
+	{
+		return false;
+	}
+
+	// Finds which connection the transmitter should snap to.
+	// Modded extractors might have multiple output connectors, so it would be best to 
+	TSet<UActorComponent*> components = extractor->GetComponents();
+	UFGFactoryConnectionComponent* closestConnection = nullptr;
+	double closestDistance;
+	for (UActorComponent* component : components)
+	{
+		UFGFactoryConnectionComponent* connection = Cast<UFGFactoryConnectionComponent>(component);
+
+		if (!IsValid(connection))
+		{
+			continue;
+		}
+
+		// Transmitters can't connect to extractor connections that are already connected.
+		if (connection->IsConnected())
+		{
+			continue;
+		}
+
+		if (connection->CanConnectTo(cachedTransmitterConnection))
+
+		if (closestConnection == nullptr)
+		{
+			closestConnection = connection;
+			closestDistance = FVector::Distance(hitResult.ImpactPoint, connection->GetConnectorLocation());
+		}
+		else
+		{
+			double newDistance = FVector::Distance(hitResult.ImpactPoint, connection->GetConnectorLocation());
+			if (newDistance < closestDistance)
+			{
+				closestDistance = newDistance;
+				closestConnection = connection;
+			}
+		}
+	}
+
+	if (!IsValid(closestConnection))
+	{
+		return false;
+	}
+
+	cachedExtractorConnection = closestConnection;
+	SnapToConnection(cachedExtractorConnection);
+
+	return true;
+}
+
+void ATransmitterHologram::SnapToConnection(const UFGFactoryConnectionComponent* connection)
+{
+	FVector locationOffset = GetActorLocation() - cachedTransmitterConnection->GetComponentLocation();
+	FRotator rotationOffset = GetActorRotation() - cachedTransmitterConnection->GetComponentRotation();
+	SetActorLocationAndRotation(locationOffset + connection->GetComponentLocation(), rotationOffset + connection->GetComponentRotation());
+}
+
+void ATransmitterHologram::CheckValidPlacement()
+{
+	if (!IsValid(cachedExtractorConnection))
+	{
+		AddConstructDisqualifier(UMustSnapToMinerDisqualifier::StaticClass());
+	}
+
+	Super::CheckValidPlacement();
+}
+
+bool ATransmitterHologram::ShouldActorBeConsideredForGuidelines(AActor* actor) const
+{
+	return false;
+}
+
+// If this isn't overriden, then the base class will hide the hologram whenever pointed at a machine (which this only snaps to extractors, so this is a problem).
+bool ATransmitterHologram::IsValidHitResult(const FHitResult& hitResult) const
+{
+	return true;
 }
