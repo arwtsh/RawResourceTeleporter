@@ -1,6 +1,8 @@
 // 
 
 #include "TransmitterHologram.h"
+
+#include "Build_TransmitterBase.h"
 #include "FGFactoryConnectionComponent.h"
 #include "MustSnapToMinerDisqualifier.h"
 
@@ -63,8 +65,12 @@ bool ATransmitterHologram::TrySnapToActor(const FHitResult& hitResult)
 			continue;
 		}
 
-		if (connection->CanConnectTo(cachedTransmitterConnection))
-
+		// Fluid to fluid, conveyor to conveyor
+		if (connection->GetConnector() != cachedTransmitterConnection->GetConnector())
+		{
+			continue;
+		}
+		
 		if (closestConnection == nullptr)
 		{
 			closestConnection = connection;
@@ -94,9 +100,16 @@ bool ATransmitterHologram::TrySnapToActor(const FHitResult& hitResult)
 
 void ATransmitterHologram::SnapToConnection(const UFGFactoryConnectionComponent* connection)
 {
-	FVector locationOffset = GetActorLocation() - cachedTransmitterConnection->GetComponentLocation();
-	FRotator rotationOffset = GetActorRotation() - cachedTransmitterConnection->GetComponentRotation();
-	SetActorLocationAndRotation(locationOffset + connection->GetComponentLocation(), rotationOffset + connection->GetComponentRotation());
+	// Finds the oposite rotation of the target by using the opposite forward vector.
+	// FRotator targetRotation = (-connection->GetComponentRotation().Quaternion().GetForwardVector()).Rotation();
+	//UE_LOG(LogTemp, Warning, TEXT("Connection position: %s\nOffset: %s"), *connection->GetComponentLocation().ToString(), *(GetActorLocation() - cachedTransmitterConnection->GetComponentLocation()).ToString());
+	//UE_LOG(LogTemp, Warning, TEXT("Snap position: %s"), *cachedTransmitterConnection->GetComponentLocation().ToString());
+	FVector location = GetActorLocation() - cachedTransmitterConnection->GetComponentLocation() + connection->GetComponentLocation();
+	FQuat rotation = connection->GetComponentRotation().Quaternion() * cachedTransmitterConnection->GetRelativeRotation().Quaternion().Inverse();
+	SetActorLocationAndRotation(location, rotation);
+
+	//parent.transform.rotation = target.transform.rotation * Quaternion.Inverse(child.transform.localRotation);
+	//parent.transform.position = parent.transform.position - child.transform.position + target.transform.position;
 }
 
 void ATransmitterHologram::CheckValidPlacement()

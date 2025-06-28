@@ -13,5 +13,8 @@ ABuild_TransmitterBase::ABuild_TransmitterBase()
 	PrimaryActorTick.bCanEverTick = true;
 
 	inputConnection = CreateDefaultSubobject<UFGFactoryConnectionComponent>(TEXT("inputConnector"));
+	inputConnection->SetupAttachment(RootComponent);
+	inputConnection->SetDirection(EFactoryConnectionDirection::FCD_SNAP_ONLY);
 }
+
 
