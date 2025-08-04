@@ -15,4 +15,7 @@ class RAWRESOURCETELEPORTER_API ABuild_RecieverBase : public AFGBuildableFactory
 public:
 	// Sets default values for this actor's properties
 	ABuild_RecieverBase();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	TArray<UFGItemDescriptor*> GetAllowedTeleportableItems() const;
 };
