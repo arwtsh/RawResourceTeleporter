@@ -13,8 +13,8 @@ ABuild_RecieverBase::ABuild_RecieverBase()
 	SaveConfig();
 }
 
-TArray<UFGItemDescriptor*> ABuild_RecieverBase::GetAllowedTeleportableItems_Implementation() const
+TSet<TSoftClassPtr<UFGItemDescriptor>> ABuild_RecieverBase::GetAllowedTeleportableItems_Implementation() const
 {
 	UE_LOG(LogTemp, Warning, TEXT("GetAllowedTeleportableItems's default implementation was called."));
-	return TArray<UFGItemDescriptor*>();
+	return TSet<TSoftClassPtr<UFGItemDescriptor>>();
 }

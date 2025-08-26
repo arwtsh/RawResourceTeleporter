@@ -6,10 +6,12 @@
 #include "RawResourceTeleporterWorldModule.h"
 #include "RawResourceTeleporter.h"
 #include "SessionSettingsManager.h"
+#include "WorldModuleManager.h"
 
-TSet<TSubclassOf<UFGItemDescriptor>> UBlueprintLibrary::GetTeleportableResources()
+URawResourceTeleporterWorldModule* UBlueprintLibrary::GetRawResourceTeleporterWorldModule(UObject* WorldContextObject)
 {
-	return URawResourceTeleporterWorldModule::GetTeleportableResources();
+	UWorldModule* worldModule = WorldContextObject->GetWorld()->GetSubsystem<UWorldModuleManager>()->FindModule(ModReference);
+	return Cast<URawResourceTeleporterWorldModule>(worldModule);
 }
 
 FString UBlueprintLibrary::SerializeTeleportableResources(const TSet<TSubclassOf<UFGItemDescriptor>> teleportableResources)

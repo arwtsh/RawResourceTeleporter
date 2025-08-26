@@ -6,6 +6,7 @@
 #include "Runtime/Engine/Classes/Kismet/BlueprintFunctionLibrary.h"
 #include "BlueprintLibrary.generated.h"
 
+class URawResourceTeleporterWorldModule;
 class UFGItemDescriptor;
 
 /**
@@ -16,10 +17,12 @@ class RAWRESOURCETELEPORTER_API UBlueprintLibrary : public UBlueprintFunctionLib
 {
 	GENERATED_BODY()
 	
+private:
+	inline static const FName ModReference = FName(TEXT("RawResourceTeleporter"));
 public:
-	UFUNCTION(BlueprintPure)
-	static TSet<TSubclassOf<UFGItemDescriptor>> GetTeleportableResources();
-
+	UFUNCTION(BlueprintPure, meta=(WorldContext="WorldContextObject"))
+	static URawResourceTeleporterWorldModule* GetRawResourceTeleporterWorldModule(UObject* WorldContextObject);
+	
 	UFUNCTION(BlueprintCallable)
 	static FString SerializeTeleportableResources(const TSet<TSubclassOf<UFGItemDescriptor>> teleportableResources);
 

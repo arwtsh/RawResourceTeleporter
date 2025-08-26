@@ -17,5 +17,5 @@ public:
 	ABuild_RecieverBase();
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	TArray<UFGItemDescriptor*> GetAllowedTeleportableItems() const;
+	TSet<TSoftClassPtr<UFGItemDescriptor>> GetAllowedTeleportableItems() const;
 };
