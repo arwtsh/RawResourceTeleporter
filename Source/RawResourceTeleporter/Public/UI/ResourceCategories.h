@@ -24,10 +24,10 @@ struct FCategoryData {
  * 
  */
 UCLASS(BlueprintType)
-class RAWRESOURCETELEPORTER_API UResourceCategories : public UPrimaryDataAsset
+class RAWRESOURCETELEPORTER_API UResourceCategories : public UDataAsset
 {
 	GENERATED_BODY()
-
+	
 	UPROPERTY(EditDefaultsOnly)
 	TArray<FCategoryData> Categories;
 
@@ -45,5 +45,4 @@ public:
 
 	UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject", AutoCreateRefTerm = "Callback, ResourcesToIgnore"))
 	void ParseResourceCategories(UObject* WorldContextObject, const FParseResourceCategoriesCallback& Callback);
-	
 };
