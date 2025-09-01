@@ -33,7 +33,7 @@ void UResourceCategories::ParseResourceCategoriesFiltered(UObject* WorldContextO
 
 			if (!AllowList.Contains(Resource))
 			{
-				//This is an expected time to ignore resources. For example, Recievers only accept whitelisted resources.
+				//This is an expected time to ignore resources. For example, Receivers only accept whitelisted resources.
 				continue;
 			}
 

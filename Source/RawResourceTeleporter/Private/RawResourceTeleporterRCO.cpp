@@ -1,20 +1,25 @@
 //
 
 #include "RawResourceTeleporterRCO.h"
-#include "Build_RecieverBase.h"
+#include "Build_ReceiverBase.h"
+#include "UnrealNetwork.h"
 
 
-void URawResourceTeleporterRCO::Server_SetRecieverResourceToTeleport_Implementation(ABuild_RecieverBase* Reciever, TSubclassOf<UFGItemDescriptor> Resource)
+void URawResourceTeleporterRCO::Server_SetReceiverResourceToTeleport_Implementation(ABuild_ReceiverBase* Receiver, TSubclassOf<UFGItemDescriptor> Resource)
 {
-	Reciever->ResourceToTeleport = Resource;
+	UE_LOG(LogTemp, Display, TEXT("Receiver SetReceiverResourceToTeleporter"));
+	Receiver->ResourceToTeleport = Resource;
 }
 
-bool URawResourceTeleporterRCO::Server_SetRecieverResourceToTeleport_Validate(ABuild_RecieverBase* Reciever, TSubclassOf<UFGItemDescriptor> Resource)
+bool URawResourceTeleporterRCO::Server_SetReceiverResourceToTeleport_Validate(ABuild_ReceiverBase* Receiver, TSubclassOf<UFGItemDescriptor> Resource)
 {
-	return Reciever->GetAllowedTeleportableItems().Contains(TSoftClassPtr<UFGItemDescriptor>(Resource));
+	UE_LOG(LogTemp, Display, TEXT("Receiver SetReceiverResourceToTeleport_Validate"));
+
+	return Receiver->GetAllowedTeleportableItems().Contains(TSoftClassPtr<UFGItemDescriptor>(Resource));
 }
 
 void URawResourceTeleporterRCO::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(URawResourceTeleporterRCO, bDummy);
 }

@@ -5,18 +5,18 @@
 #include "CoreMinimal.h"
 #include "FGBuildableFactory.h"
 
-#include "Build_RecieverBase.generated.h"
+#include "Build_ReceiverBase.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnResourceToTeleportChanged, TSubclassOf<UFGItemDescriptor>, Resource);
 
 UCLASS(Abstract)
-class RAWRESOURCETELEPORTER_API ABuild_RecieverBase : public AFGBuildableFactory
+class RAWRESOURCETELEPORTER_API ABuild_ReceiverBase : public AFGBuildableFactory
 {
 	GENERATED_BODY()
 
 public:
 	// Sets default values for this actor's properties
-	ABuild_RecieverBase();
+	ABuild_ReceiverBase();
 
 	void SetResourceToTeleport(TSubclassOf<UFGItemDescriptor> Resource);
 
