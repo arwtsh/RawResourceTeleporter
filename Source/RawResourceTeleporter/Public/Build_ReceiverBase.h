@@ -18,13 +18,11 @@ public:
 	// Sets default values for this actor's properties
 	ABuild_ReceiverBase();
 
-	void SetResourceToTeleport(TSubclassOf<UFGItemDescriptor> Resource);
-
 public:
 	UPROPERTY(BlueprintAssignable)
 	FOnResourceToTeleportChanged OnResourceToTeleportChanged;
 
-	UPROPERTY(BlueprintReadOnly, ReplicatedUsing="OnRep_ResourceToTeleport", SaveGame)
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_ResourceToTeleport, SaveGame)
 	TSubclassOf<UFGItemDescriptor> ResourceToTeleport;
 	
 public:
@@ -34,5 +32,8 @@ public:
 	UFUNCTION()
 	void OnRep_ResourceToTeleport() const;
 
+	UFUNCTION(BlueprintCallable)
+	void SetResourceToTeleport(TSubclassOf<UFGItemDescriptor> Resource);
+	
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 };

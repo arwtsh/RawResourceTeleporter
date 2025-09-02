@@ -17,13 +17,16 @@ class RAWRESOURCETELEPORTER_API URawResourceTeleporterRCO : public UFGRemoteCall
 {
 	GENERATED_BODY()
 
-public:
+private:
 	//This doesn't do anything. If a RCO doesn't have a replicated property it won't work properly.
 	UPROPERTY(Replicated)
 	bool bDummy = true;
-	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	
 public:
-	UFUNCTION(Server, WithValidation, Reliable, BlueprintCallable)
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	static URawResourceTeleporterRCO* Get(const UObject* WorldContext);
+
+public:
+	UFUNCTION(Server, Reliable)
 	void Server_SetReceiverResourceToTeleport(ABuild_ReceiverBase* Receiver, TSubclassOf<UFGItemDescriptor> Resource);
 };

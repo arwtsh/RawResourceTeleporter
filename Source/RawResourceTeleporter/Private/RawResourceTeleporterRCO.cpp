@@ -2,20 +2,27 @@
 
 #include "RawResourceTeleporterRCO.h"
 #include "Build_ReceiverBase.h"
+#include "FGPlayerController.h"
 #include "UnrealNetwork.h"
 
 
 void URawResourceTeleporterRCO::Server_SetReceiverResourceToTeleport_Implementation(ABuild_ReceiverBase* Receiver, TSubclassOf<UFGItemDescriptor> Resource)
 {
-	UE_LOG(LogTemp, Display, TEXT("Receiver SetReceiverResourceToTeleporter"));
-	Receiver->ResourceToTeleport = Resource;
+	Receiver->SetResourceToTeleport(Resource);
+	Receiver->ForceNetUpdate();
 }
 
-bool URawResourceTeleporterRCO::Server_SetReceiverResourceToTeleport_Validate(ABuild_ReceiverBase* Receiver, TSubclassOf<UFGItemDescriptor> Resource)
+URawResourceTeleporterRCO* URawResourceTeleporterRCO::Get(const UObject* WorldContext)
 {
-	UE_LOG(LogTemp, Display, TEXT("Receiver SetReceiverResourceToTeleport_Validate"));
+	if (WorldContext)
+	{
+		if (AFGPlayerController* Controller = Cast<AFGPlayerController>(WorldContext->GetWorld()->GetFirstPlayerController()))
+		{
+			return Controller->GetRemoteCallObjectOfClass<URawResourceTeleporterRCO>();
+		}
+	}
 
-	return Receiver->GetAllowedTeleportableItems().Contains(TSoftClassPtr<UFGItemDescriptor>(Resource));
+	return nullptr;
 }
 
 void URawResourceTeleporterRCO::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
