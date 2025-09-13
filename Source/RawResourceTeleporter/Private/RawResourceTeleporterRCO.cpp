@@ -4,10 +4,13 @@
 #include "Build_ReceiverBase.h"
 #include "FGPlayerController.h"
 #include "UnrealNetwork.h"
+#include "RawResourceTeleporter.h"
 
 
 void URawResourceTeleporterRCO::Server_SetReceiverResourceToTeleport_Implementation(ABuild_ReceiverBase* Receiver, TSubclassOf<UFGItemDescriptor> Resource)
 {
+	Receiver->EjectInventory(GetOwnerPlayerCharacter());
+
 	Receiver->SetResourceToTeleport(Resource);
 	Receiver->ForceNetUpdate();
 }

@@ -34,10 +34,15 @@ public:
 	
 	UPROPERTY(BlueprintAssignable)
 	FOnTeleportableResourcesUpdated OnFluidTeleportableResourcesUpdated;
+
 	
 private:
 	UFUNCTION()
 	void UpdateTeleportableResources(const FString& updatedCvar);
 
 	virtual void DispatchLifecycleEvent(ELifecyclePhase Phase) override;
+
+public:
+	//Removes an item from a Transmitter, and returns a bool if successful.
+	static bool TryTeleportResource(TSubclassOf<UFGItemDescriptor> ResourceToTeleport);
 };

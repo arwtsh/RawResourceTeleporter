@@ -57,3 +57,8 @@ void URawResourceTeleporterWorldModule::DispatchLifecycleEvent(ELifecyclePhase P
 	//Populate the initial value of teleportableResources from the saved data or default
 	UpdateTeleportableResources(CONFIG_ID);
 }
+
+bool URawResourceTeleporterWorldModule::TryTeleportResource(TSubclassOf<UFGItemDescriptor> ResourceToTeleport)
+{
+	return true;
+}

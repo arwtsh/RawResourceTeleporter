@@ -27,6 +27,6 @@ public:
 	static URawResourceTeleporterRCO* Get(const UObject* WorldContext);
 
 public:
-	UFUNCTION(Server, Reliable)
+	UFUNCTION(Server, Reliable, BlueprintCallable)
 	void Server_SetReceiverResourceToTeleport(ABuild_ReceiverBase* Receiver, TSubclassOf<UFGItemDescriptor> Resource);
 };
