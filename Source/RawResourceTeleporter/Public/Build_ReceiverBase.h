@@ -22,11 +22,6 @@ private:
 	UPROPERTY( SaveGame, Meta = ( NoAutoJson = true, FGReplicated ) )
 	float CurrentCycleProgress;
 
-	//The number of items to teleport per cycle.
-	//This is useful for reducing the length of a cycle, instead of it teleporting 1 item 4800 times a minute (4 mk6 belt outputs), it could teleport 4 items 1200 times a minute
-	UPROPERTY(EditDefaultsOnly)
-	int ItemsPerCycle;
-
 	//The raw time it takes for this receiver to teleport a group of items.
 	//This does not factor in speed modifiers such as over/under clocking.
 	UPROPERTY(EditDefaultsOnly)
@@ -55,6 +50,11 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	float EmergencyCrateOffset;
+
+	//The number of items to teleport per cycle.
+	//This is useful for reducing the length of a cycle, instead of it teleporting 1 item 4800 times a minute (4 mk6 belt outputs), it could teleport 4 items 1200 times a minute
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	int ItemsPerCycle;
 
 protected:
 	virtual void Factory_TickProducing( float dt ) override;
