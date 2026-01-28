@@ -7,7 +7,15 @@
 #include "Buildables/FGBuildableResourceExtractor.h"
 #include "TransmitterHologram.generated.h"
 
-UCLASS(Abstract)
+UENUM()
+enum class ETransmitterType : uint8
+{
+	Solid,
+	Fluid,
+	Attachment
+};
+
+UCLASS()
 class RAWRESOURCETELEPORTER_API ATransmitterHologram : public AFGBuildableHologram
 {
 	GENERATED_BODY()
@@ -20,6 +28,8 @@ protected:
 private:
 	UFGFactoryConnectionComponent* cachedExtractorConnection = nullptr;
 	UFGFactoryConnectionComponent* cachedTransmitterConnection = nullptr;
+
+	ETransmitterType transmitterType = ETransmitterType::Solid;
 		
 public:
 	// Sets default values for this actor's properties
@@ -34,6 +44,10 @@ public:
 	bool IsValidHitResult(const FHitResult& hitResult) const override;
 
 	bool ShouldActorBeConsideredForGuidelines(AActor* actor) const override;
+
+	// This is called every frame.
+	// If it returns a recipe for a different object, it completely deletes this current hologram and makes a new one.
+	virtual TOptional<TSubclassOf<UFGRecipe>> ProcessHologramOverride(const FHitResult& hitResult) const override;
 	
 private:
 	void SnapToConnection(const UFGFactoryConnectionComponent* connection);

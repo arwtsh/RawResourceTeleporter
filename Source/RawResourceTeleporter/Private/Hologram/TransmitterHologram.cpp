@@ -2,9 +2,11 @@
 
 #include "TransmitterHologram.h"
 
+#include "RawResourceTeleporter.h"
 #include "Build_TransmitterBase.h"
 #include "FGFactoryConnectionComponent.h"
 #include "MustSnapToMinerDisqualifier.h"
+#include "Hologram/HologramOverrides.h"
 
 ATransmitterHologram::ATransmitterHologram()
 {
@@ -14,12 +16,15 @@ ATransmitterHologram::ATransmitterHologram()
 
 void ATransmitterHologram::BeginPlay()
 {
+	//To-do: delete this
+	UE_LOG(LogRawResourceTeleporter, Error, TEXT("New hologram"));
+
 	Super::BeginPlay();
 
 	// The hologram should only have 1 input connection. It will crash if there are none.
 	cachedTransmitterConnection = GetCachedFactoryConnectionComponents()[0];
 
-	// Can be placed hovering over a surface as long as its attached to the extractor.
+	// Can be placed hovering over a surface as long as it's attached to the extractor.
 	SetNeedsValidFloor(false);
 }
 
@@ -125,6 +130,35 @@ void ATransmitterHologram::CheckValidPlacement()
 bool ATransmitterHologram::ShouldActorBeConsideredForGuidelines(AActor* actor) const
 {
 	return false;
+}
+
+TOptional<TSubclassOf<UFGRecipe>> ATransmitterHologram::ProcessHologramOverride(const FHitResult& hitResult) const
+{
+	//Called every frame. Check if the hitResult still points to the same actor and short-circuit.
+	UE_LOG(LogRawResourceTeleporter, Display, TEXT("ProcessHologramOverride called"));
+
+	ABuild_TransmitterBase* buildable = GetDefaultBuildable<ABuild_TransmitterBase>();
+
+	//Make sure nothing weird happened.
+	if (!buildable)
+		return{};
+
+	UHologramOverrides* hologramOverrides = buildable->GetHologramOverride();
+	
+	// If the player is looking at something, pass control to the HologramOverride data asset assigned to the buildable
+	// and if it has one of the tags associated with a Transmitter attachment, return the override.
+	if (AActor* hitActor = hitResult.GetActor())
+	{
+		TOptional<TSubclassOf<UFGRecipe>> result = hologramOverrides->GetHologramOverride(this, hitActor->GetClass());
+		if (result.IsSet())
+		{			
+			return result.GetValue();
+			//transmitterType = ETransmitterType::Attachment;
+		}
+	}
+
+	// If either the player isn't looking at something, or it doesn't have a tag, then override with a standalone transmitter.
+	return hologramOverrides->GetSolidStandaloneTransmitter();
 }
 
 // If this isn't overriden, then the base class will hide the hologram whenever pointed at a machine (which this only snaps to extractors, so this is a problem).
