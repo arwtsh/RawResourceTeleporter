@@ -1,24 +1,44 @@
-// 
+#include "Hologram/TransmitterAttachmentHologram.h"
+#include "Hologram/HologramOverrides.h"
+#include "Hologram/TransmitterBuildModes.h"
+#include "RawResourceTeleporter.h" //For logging
 
-#include "TransmitterHologram.h"
 
-#include "RawResourceTeleporter.h"
-#include "Build_TransmitterBase.h"
 #include "FGFactoryConnectionComponent.h"
 #include "MustSnapToMinerDisqualifier.h"
-#include "Hologram/HologramOverrides.h"
 
-ATransmitterHologram::ATransmitterHologram()
+
+TOptional<TSubclassOf<UFGRecipe>> ATransmitterAttachmentHologram::GetHologramOverride(const UHologramOverrides* hologramOverrides, const AActor* hitActor) const
 {
-	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	TOptional<TSubclassOf<UFGRecipe>> result = Super::GetHologramOverride(hologramOverrides, hitActor);
+
+	//The base class's GetHologramOverride only consideres new attachments.
+	//To keep the same attachment, it will return the recipe the build gun is currently using
+	//and the build gun won't change anything.
+	//But if it returns nothing, then it shouldn't be using an attachment.
+	//Since this is the attachment hologram, it needs to override to a standalone.
+	if (!result.IsSet())
+	{
+		//Change which standalone gets overriden to based on the current build mode.
+		if (IsCurrentBuildMode(USolidTransmitterBuildMode::StaticClass()))
+		{
+			result = hologramOverrides->GetSolidStandaloneTransmitter();
+		}
+		else if (IsCurrentBuildMode(UFluidTransmitterBuildMode::StaticClass()))
+		{
+			result = hologramOverrides->GetFluidStandaloneTransmitter();
+		}
+		else
+		{
+			UE_LOG(LogRawResourceTeleporter, Warning, TEXT("TransmitterAttachmentHologram tried to override to a standalone transmitter, but it found an unknown build mode! This hologram should only have Solid or Fluid build modes."));
+		}
+	}
+
+	return result;
 }
 
-void ATransmitterHologram::BeginPlay()
+void ATransmitterAttachmentHologram::BeginPlay()
 {
-	//To-do: delete this
-	UE_LOG(LogRawResourceTeleporter, Error, TEXT("New hologram"));
-
 	Super::BeginPlay();
 
 	// The hologram should only have 1 input connection. It will crash if there are none.
@@ -28,7 +48,7 @@ void ATransmitterHologram::BeginPlay()
 	SetNeedsValidFloor(false);
 }
 
-bool ATransmitterHologram::TrySnapToActor(const FHitResult& hitResult)
+bool ATransmitterAttachmentHologram::TrySnapToActor(const FHitResult& hitResult)
 {
 	const AActor* Actor = hitResult.GetActor();
 
@@ -103,7 +123,7 @@ bool ATransmitterHologram::TrySnapToActor(const FHitResult& hitResult)
 	return true;
 }
 
-void ATransmitterHologram::SnapToConnection(const UFGFactoryConnectionComponent* connection)
+void ATransmitterAttachmentHologram::SnapToConnection(const UFGFactoryConnectionComponent* connection)
 {
 	// Finds the oposite rotation of the target by using the opposite forward vector.
 	// FRotator targetRotation = (-connection->GetComponentRotation().Quaternion().GetForwardVector()).Rotation();
@@ -117,7 +137,7 @@ void ATransmitterHologram::SnapToConnection(const UFGFactoryConnectionComponent*
 	//parent.transform.position = parent.transform.position - child.transform.position + target.transform.position;
 }
 
-void ATransmitterHologram::CheckValidPlacement()
+void ATransmitterAttachmentHologram::CheckValidPlacement()
 {
 	if (!IsValid(cachedExtractorConnection))
 	{
@@ -127,42 +147,9 @@ void ATransmitterHologram::CheckValidPlacement()
 	Super::CheckValidPlacement();
 }
 
-bool ATransmitterHologram::ShouldActorBeConsideredForGuidelines(AActor* actor) const
+bool ATransmitterAttachmentHologram::ShouldActorBeConsideredForGuidelines(AActor* actor) const
 {
 	return false;
 }
 
-TOptional<TSubclassOf<UFGRecipe>> ATransmitterHologram::ProcessHologramOverride(const FHitResult& hitResult) const
-{
-	//Called every frame. Check if the hitResult still points to the same actor and short-circuit.
-	UE_LOG(LogRawResourceTeleporter, Display, TEXT("ProcessHologramOverride called"));
 
-	ABuild_TransmitterBase* buildable = GetDefaultBuildable<ABuild_TransmitterBase>();
-
-	//Make sure nothing weird happened.
-	if (!buildable)
-		return{};
-
-	UHologramOverrides* hologramOverrides = buildable->GetHologramOverride();
-	
-	// If the player is looking at something, pass control to the HologramOverride data asset assigned to the buildable
-	// and if it has one of the tags associated with a Transmitter attachment, return the override.
-	if (AActor* hitActor = hitResult.GetActor())
-	{
-		TOptional<TSubclassOf<UFGRecipe>> result = hologramOverrides->GetHologramOverride(this, hitActor->GetClass());
-		if (result.IsSet())
-		{			
-			return result.GetValue();
-			//transmitterType = ETransmitterType::Attachment;
-		}
-	}
-
-	// If either the player isn't looking at something, or it doesn't have a tag, then override with a standalone transmitter.
-	return hologramOverrides->GetSolidStandaloneTransmitter();
-}
-
-// If this isn't overriden, then the base class will hide the hologram whenever pointed at a machine (which this only snaps to extractors, so this is a problem).
-bool ATransmitterHologram::IsValidHitResult(const FHitResult& hitResult) const
-{
-	return true;
-}

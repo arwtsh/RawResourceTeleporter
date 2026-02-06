@@ -5,6 +5,7 @@
 #include "Hologram/HologramOverrides.h"
 #include "RawResourceTeleporter.h"
 #include "FGFactoryConnectionComponent.h"
+#include "FGRecipeManager.h"
 
 
 // Sets default values
@@ -23,10 +24,24 @@ UHologramOverrides* ABuild_TransmitterBase::GetHologramOverride() const
 	if (!HologramOverrides)
 	{
 		UE_LOG(LogRawResourceTeleporter, Error, TEXT("Forgot to assign the HologramOverrides asset to Transmitter asset %s"), *StaticClass()->GetName());
-		return {};
+		return nullptr;
 	}
 	
 	return HologramOverrides;
+}
+
+bool ABuild_TransmitterBase::CanBeSampled_Implementation() const
+{
+	if( AFGRecipeManager* recipeManager = AFGRecipeManager::Get( GetWorld() ) )
+	{
+		if (UHologramOverrides* hologramOverrides = GetHologramOverride())
+		{
+			//Normal buildable uses IsBuildingAvailable(GetClass());
+			return recipeManager->IsRecipeAvailable(hologramOverrides->GetSolidStandaloneTransmitter());
+		}
+	}
+
+	return false;
 }
 
 
