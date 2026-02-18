@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "FGBuildableFactory.h"
-
 #include "Build_ReceiverBase.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnResourceToTeleportChanged, TSubclassOf<UFGItemDescriptor>, Resource);
@@ -37,7 +36,6 @@ public:
 	// Sets default values for this actor's properties
 	ABuild_ReceiverBase();
 	virtual void BeginPlay() override;
-
 public:
 	UPROPERTY(BlueprintAssignable)
 	FOnResourceToTeleportChanged OnResourceToTeleportChanged;

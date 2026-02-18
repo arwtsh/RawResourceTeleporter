@@ -2,7 +2,9 @@
 {
     "$schema": "https://raw.githubusercontent.com/budak7273/ContentLib_Documentation/main/JsonSchemas/CL_Schematic.json",
     "Recipes": [
-        "/RawResourceTeleporter/Recipes/Recipe_Receiver.Recipe_Receiver_C", 
-        "/RawResourceTeleporter/Recipes/Recipe_SolidStandaloneTransmitter.Recipe_SolidStandaloneTransmitter_C"
+        "/RawResourceTeleporter/Recipes/Recipe_SolidReceiver.Recipe_SolidReceiver_C",         
+        "/RawResourceTeleporter/Recipes/Recipe_FluidReceiver.Recipe_FluidReceiver_C", 
+        "/RawResourceTeleporter/Recipes/Recipe_SolidTransmitter.Recipe_SolidTransmitter_C",
+        "/RawResourceTeleporter/Recipes/Recipe_FluidTransmitter.Recipe_FluidTransmitter_C"
     ]
 }
